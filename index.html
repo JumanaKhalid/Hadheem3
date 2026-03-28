@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Food Filter - Stable Version</title>
+    
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.0/dist/mindar-face-aframe.prod.js"></script>
+
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #ui {
+            position: absolute; bottom: 20px; left: 50%;
+            transform: translateX(-50%); display: flex; gap: 10px; z-index: 999;
+        }
+        button {
+            padding: 15px 20px; border-radius: 25px; border: none;
+            font-weight: bold; cursor: pointer; color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        #healthy { background: #2ecc71; }
+        #unhealthy { background: #e74c3c; }
+        #msg {
+            position: absolute; top: 10px; width: 100%; text-align: center;
+            color: white; background: rgba(0,0,0,0.5); z-index: 1000; padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="msg">وجه الكاميرا نحو وجهك واضغط الأزرار</div>
+
+    <div id="ui">
+        <button id="healthy">غذاء صحي 🍎</button>
+        <button id="unhealthy">غذاء غير صحي 🍔</button>
+    </div>
+
+    <a-scene 
+        mindar-face="filterMinCF:0.001; filterBeta: 10; cameraDevice: user" 
+        embedded 
+        color-space="sRGB" 
+        renderer="colorManagement: true" 
+        vr-mode-ui="enabled: false" 
+        device-orientation-permission-ui="enabled: false">
+        
+        <a-camera active="false" position="0 0 0"></a-camera>
+
+        <a-entity mindar-face-target="anchorIndex: 1">
+            
+            <a-entity id="group-healthy" visible="false">
+                <a-sphere position="0.15 -0.1 0.1" radius="0.05" color="#FFB6C1" opacity="0.5"></a-sphere>
+                <a-sphere position="-0.15 -0.1 0.1" radius="0.05" color="#FFB6C1" opacity="0.5"></a-sphere>
+                <a-ellipse position="0 -0.25 0.1" radius-x="0.05" radius-y="0.02" color="white" opacity="0.8"></a-ellipse>
+            </a-entity>
+
+            <a-entity id="group-unhealthy" visible="false">
+                <a-ellipse position="0.1 0.1 0.1" radius-x="0.05" radius-y="0.02" color="black" opacity="0.6"></a-ellipse>
+                <a-ellipse position="-0.1 0.1 0.1" radius-x="0.05" radius-y="0.02" color="black" opacity="0.6"></a-ellipse>
+                <a-plane position="0 0 0.05" width="0.5" height="0.7" color="#556b2f" opacity="0.1"></a-plane>
+            </a-entity>
+
+        </a-entity>
+    </a-scene>
+
+    <script>
+        const hBtn = document.getElementById('healthy');
+        const uBtn = document.getElementById('unhealthy');
+        const hGroup = document.getElementById('group-healthy');
+        const uGroup = document.getElementById('group-unhealthy');
+
+        hBtn.addEventListener('click', () => {
+            hGroup.setAttribute('visible', 'true');
+            uGroup.setAttribute('visible', 'false');
+            console.log("Healthy mode active");
+        });
+
+        uBtn.addEventListener('click', () => {
+            uGroup.setAttribute('visible', 'true');
+            hGroup.setAttribute('visible', 'false');
+            console.log("Unhealthy mode active");
+        });
+
+        // حل مشكلة المتصفحات التي ترفض الكاميرا الأمامية تلقائياً
+        window.addEventListener('load', () => {
+            const sceneEl = document.querySelector('a-scene');
+            sceneEl.addEventListener('renderstart', () => {
+                // التأكد من تشغيل التتبع
+                console.log("AR Scene Started");
+            });
+        });
+    </script>
+</body>
+</html>
